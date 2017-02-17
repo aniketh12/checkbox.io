@@ -2,7 +2,6 @@ var mongo = require('mongodb');
 var crypto = require('crypto');
 var emailjs = require('emailjs/email');
 var models = require('./studyModel.js');
-
  
 var Server = mongo.Server,
     Db = mongo.Db,
@@ -10,15 +9,15 @@ var Server = mongo.Server,
  
 var MongoClient = mongo.MongoClient;
 var db = null;
-MongoClient.connect("mongodb://user:password@ip:27017/site?authSource=admin", function(err, authdb) {
+MongoClient.connect("mongodb://"+process.env.MONGO_USER+":"+process.env.MONGO_PW+"@localhost:27017/site?authSource=admin", function(err, authdb) {
   // Now you can use the database in the db variable
   db = authdb;
   console.log( err || "connected!" );
 });
 
 var emailServer  = emailjs.server.connect({
-   user:    "supportemail@domain.com", 
-   password:"supportpwd", 
+   user:  process.env.GMAIL_USER,
+   password: process.env.GMAIL_PW,
    host:    "smtp.gmail.com", 
    ssl:     true
 });
@@ -43,7 +42,7 @@ exports.createStudy = function(req, res) {
 
         	collection.insert(study, {safe:true}, function(err, result) 
         	{
-        		console.log( err || "Study created: " + result[0]._id );
+        		console.log( err || "Study created: " + study._id );
 
         		if( err )
         		{
@@ -51,7 +50,7 @@ exports.createStudy = function(req, res) {
         		}
         		else
         		{
-                    study.setPublicLink( result[0]._id );
+                    study.setPublicLink( study._id );
 
                     // update with new public link, and notify via email, redirect user to admin page.
                     collection.update( {'_id' : study._id}, {'$set' : {'publicLink' : study.publicLink}},

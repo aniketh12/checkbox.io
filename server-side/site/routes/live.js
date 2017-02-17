@@ -2,13 +2,14 @@ var mongo = require('mongodb');
 var check = require('validator').check;
 var _ = require('underscore');
 
+
 var Server = mongo.Server,
     Db = mongo.Db,
     ObjectID = mongo.BSONPure.ObjectID;
  
 var MongoClient = mongo.MongoClient;
 var db = null;
-MongoClient.connect("mongodb://user:password@ip:27017/site?authSource=admin", function(err, authdb) {
+MongoClient.connect("mongodb://"+process.env.MONGO_USER+":"+process.env.MONGO_PW+"@localhost:27017/site?authSource=admin", function(err, authdb) {
   // Now you can use the database in the db variable
   db = authdb;
   console.log( err || "connected!" );
